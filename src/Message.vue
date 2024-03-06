@@ -8,18 +8,6 @@
         system: message.type === 'system'
       }"
     >
-      <slot name="user-avatar" :message="message" :user="user">
-        <div
-          v-if="message.type !== 'system' && authorName && authorName !== 'me'"
-          v-tooltip="authorName"
-          :title="authorName"
-          class="sc-message--avatar"
-          :style="{
-            backgroundImage: `url(${chatImageUrl})`
-          }"
-        ></div>
-      </slot>
-
       <TextMessage
         v-if="message.type === 'text'"
         :message="message"
@@ -37,43 +25,19 @@
           >
           </slot>
         </template>
-        <template v-slot:text-message-toolbox="scopedProps">
-          <slot name="text-message-toolbox" :message="scopedProps.message" :me="scopedProps.me">
-          </slot>
-        </template>
       </TextMessage>
-      <EmojiMessage v-else-if="message.type === 'emoji'" :data="message.data" />
-      <FileMessage
-        v-else-if="message.type === 'file'"
-        :data="message.data"
-        :message-colors="messageColors"
-      />
-      <TypingMessage v-else-if="message.type === 'typing'" :message-colors="messageColors" />
-      <SystemMessage
-        v-else-if="message.type === 'system'"
-        :data="message.data"
-        :message-colors="messageColors"
-      >
-        <slot name="system-message-body" :message="message.data"> </slot>
-      </SystemMessage>
     </div>
   </div>
 </template>
 
 <script>
 import TextMessage from './messages/TextMessage.vue'
-import FileMessage from './messages/FileMessage.vue'
-import EmojiMessage from './messages/EmojiMessage.vue'
-import TypingMessage from './messages/TypingMessage.vue'
 import SystemMessage from './messages/SystemMessage.vue'
 import chatIcon from './assets/chat-icon.svg'
 
 export default {
   components: {
     TextMessage,
-    FileMessage,
-    EmojiMessage,
-    TypingMessage,
     SystemMessage
   },
   props: {

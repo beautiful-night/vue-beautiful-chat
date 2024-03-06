@@ -1,14 +1,7 @@
 <template>
-  <div>
-    <Suggestions :suggestions="suggestions" :colors="colors" @sendSuggestion="_submitSuggestion" />
-    <div
-      v-if="file"
-      class="file-container"
-      :style="{
-        backgroundColor: colors.userInput.text,
-        color: colors.userInput.bg
-      }"
-    >
+  <div style="padding: 12px">
+    <!-- <Suggestions :suggestions="suggestions" :colors="colors" @sendSuggestion="_submitSuggestion" /> -->
+    <div v-if="file" class="file-container">
       <span class="icon-file-message"
         ><img :src="icons.file.img" :alt="icons.file.name" height="15"
       /></span>
@@ -21,31 +14,26 @@
           title="Remove the file"
       /></span>
     </div>
-    <form
-      class="sc-user-input"
-      :class="{active: inputActive}"
-      :style="{background: colors.userInput.bg}"
-    >
+    <form class="sc-user-input" :class="{active: inputActive}">
       <div
         ref="userInput"
         role="button"
         tabIndex="0"
-        contentEditable="true"
+        contentEditable="plaintext-only"
         :placeholder="placeholder"
-        class="sc-user-input--text"
-        :style="{color: colors.userInput.text}"
+        :class="{'sc-user-input--text': true, 'sc-user-input--text-second': asSecondChatBox}"
         @focus="setInputActive(true)"
         @blur="setInputActive(false)"
         @keydown="handleKey"
         @focusUserInput="focusUserInput()"
       ></div>
       <div class="sc-user-input--buttons">
-        <div v-if="showEmoji && !isEditing" class="sc-user-input--button">
+        <!-- <div v-if="showEmoji && !isEditing" class="sc-user-input--button">
           <EmojiIcon :on-emoji-picked="_handleEmojiPicked" :color="colors.userInput.text" />
         </div>
         <div v-if="showFile && !isEditing" class="sc-user-input--button">
           <FileIcons :on-change="_handleFileSubmit" :color="colors.userInput.text" />
-        </div>
+        </div> -->
         <div v-if="isEditing" class="sc-user-input--button">
           <UserInputButton
             :color="colors.userInput.text"
@@ -139,6 +127,10 @@ export default {
     colors: {
       type: Object,
       required: true
+    },
+    asSecondChatBox: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -287,33 +279,45 @@ export default {
 
 <style scoped>
 .sc-user-input {
-  min-height: 55px;
+  min-height: 44px;
   margin: 0px;
   position: relative;
   bottom: 0;
   display: flex;
-  background-color: #f4f7f9;
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
+  background-color: #fff;
+  border-radius: 4px;
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .sc-user-input--text {
   flex-grow: 1;
   outline: none;
-  border-bottom-left-radius: 10px;
+  border-radius: 10px;
   box-sizing: border-box;
-  padding: 18px;
+  padding: 12px;
   font-size: 15px;
   line-height: 1.33;
-  white-space: pre-wrap;
-  word-wrap: break-word;
+  /* white-space: pre-wrap;
+  word-wrap: break-word; */
   color: #565867;
   -webkit-font-smoothing: antialiased;
-  max-height: 200px;
+  max-height: 44px;
   overflow-x: hidden;
   overflow-y: auto;
+  background-color: #fff;
+  height: 44px;
+  overflow-x: scroll;
+  padding: 12px;
+  height: 44px;
+  white-space: nowrap;
 }
+
+/* .sc-user-input--text-second {
+  overflow-x: scroll;
+  padding: 12px;
+  height: 44px;
+  white-space: nowrap;
+} */
 
 .sc-user-input--text:empty:before {
   content: attr(placeholder);
@@ -325,12 +329,17 @@ export default {
 
 .sc-user-input--buttons {
   display: flex;
-  align-items: center;
+  align-items: end;
   padding: 0 4px;
+  background-color: #fff;
+  border-radius: 4px;
+  padding-bottom: 12px;
+  padding-right: 12px;
 }
 
 .sc-user-input--button {
   margin: 0 4px;
+  transform: rotate(45deg);
 }
 
 .sc-user-input.active {

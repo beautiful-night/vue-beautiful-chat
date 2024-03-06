@@ -1,24 +1,12 @@
 <template>
-  <div>
-    <div
-      v-if="showLauncher"
-      class="sc-launcher"
-      :class="{opened: isOpen}"
-      :style="{backgroundColor: colors.launcher.bg}"
-      @click.prevent="isOpen ? close() : openAndFocus()"
-    >
-      <div v-if="newMessagesCount > 0 && !isOpen" class="sc-new-messsages-count">
-        {{ newMessagesCount }}
-      </div>
-      <img v-if="isOpen" class="sc-closed-icon" :src="icons.close.img" :alt="icons.close.name" />
-      <img v-else class="sc-open-icon" :src="icons.open.img" :alt="icons.open.name" />
-    </div>
+  <div class="sp-chat-container">
     <ChatWindow
+      :class="chatWindowClass"
       :message-list="messageList"
       :on-user-input-submit="onMessageWasSent"
       :participants="participants"
       :title="chatWindowTitle"
-      :is-open="isOpen"
+      :is-open="true"
       :show-emoji="showEmoji"
       :show-file="showFile"
       :show-header="showHeader"
@@ -26,7 +14,13 @@
       :show-typing-indicator="showTypingIndicator"
       :colors="colors"
       :always-scroll-to-bottom="alwaysScrollToBottom"
+      :as-second-chat-box="asSecondChatBox"
       :message-styling="messageStyling"
+      :width="width"
+      :height="height"
+      :noFixed="true"
+      :showUserInput="showUserInput"
+      :loading="loading"
       @close="close"
       @scrollToTop="$emit('scrollToTop')"
       @onType="$emit('onType')"
@@ -47,13 +41,6 @@
           :messageColors="scopedProps.messageColors"
           :me="scopedProps.me"
         >
-        </slot>
-      </template>
-      <template v-slot:system-message-body="scopedProps">
-        <slot name="system-message-body" :message="scopedProps.message"> </slot>
-      </template>
-      <template v-slot:text-message-toolbox="scopedProps">
-        <slot name="text-message-toolbox" :message="scopedProps.message" :me="scopedProps.me">
         </slot>
       </template>
     </ChatWindow>
@@ -216,16 +203,40 @@ export default {
     disableUserListToggle: {
       type: Boolean,
       default: false
+    },
+    showUserInput: {
+      type: Boolean,
+      default: true
+    },
+    asSecondChatBox: {
+      type: Boolean,
+      default: false
+    },
+    chatWindowClass: {
+      type: String,
+      default: ''
+    },
+    width: {
+      type: Number,
+      default: 370
+    },
+    height: {
+      type: String,
+      default: null
+    },
+    customThemeColor: {
+      type: String,
+      default: '#001751'
+    },
+    loading: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
     chatWindowTitle() {
       if (this.title !== '') return this.title
-
-      if (this.participants.length === 0) return 'You'
-      if (this.participants.length > 1) return 'You, ' + this.participants[0].name + ' & others'
-
-      return 'You & ' + this.participants[0].name
+      return '流程AI助手'
     }
   },
   watch: {
@@ -249,6 +260,11 @@ export default {
 </script>
 
 <style scoped>
+/* .sp-chat-container {
+  width: 370px;
+  height: 100%;
+} */
+
 .sc-launcher {
   width: 60px;
   height: 60px;
@@ -261,6 +277,7 @@ export default {
   box-shadow: none;
   transition: box-shadow 0.2s ease-in-out;
   cursor: pointer;
+  z-index: 2000;
 }
 
 .sc-launcher:before {
@@ -281,6 +298,7 @@ export default {
   right: 25px;
   bottom: 25px;
   transition: opacity 100ms ease-in-out, transform 100ms ease-in-out;
+  z-index: 2000;
 }
 
 .sc-launcher .sc-closed-icon {

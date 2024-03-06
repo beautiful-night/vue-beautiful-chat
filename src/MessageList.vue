@@ -1,7 +1,11 @@
 <template>
   <div
     ref="scrollList"
-    class="sc-message-list"
+    :class="{
+      'sc-message-list': true,
+      'sc-message-list-no-header': !showHeader,
+      'message-list-empty': !(messages.length > 0) && !loading
+    }"
     :style="{backgroundColor: colors.messageList.bg}"
     @scroll="handleScroll"
   >
@@ -14,9 +18,6 @@
       :message-styling="messageStyling"
       @remove="$emit('remove', message)"
     >
-      <template v-slot:user-avatar="scopedProps">
-        <slot name="user-avatar" :user="scopedProps.user" :message="scopedProps.message"> </slot>
-      </template>
       <template v-slot:text-message-body="scopedProps">
         <slot
           name="text-message-body"
@@ -30,24 +31,21 @@
       <template v-slot:system-message-body="scopedProps">
         <slot name="system-message-body" :message="scopedProps.message"> </slot>
       </template>
-      <template v-slot:text-message-toolbox="scopedProps">
-        <slot name="text-message-toolbox" :message="scopedProps.message" :me="scopedProps.me">
-        </slot>
-      </template>
     </Message>
-    <Message
-      v-show="showTypingIndicator !== ''"
-      :message="{author: showTypingIndicator, type: 'typing'}"
-      :user="profile(showTypingIndicator)"
-      :colors="colors"
-      :message-styling="messageStyling"
-    />
+    <div v-if="loading" class="loading">
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
   </div>
 </template>
 
 <script>
 import Message from './Message.vue'
 import chatIcon from './assets/chat-icon.svg'
+import {mapState} from './store/'
 
 export default {
   components: {
@@ -77,6 +75,14 @@ export default {
     messageStyling: {
       type: Boolean,
       required: true
+    },
+    showHeader: {
+      type: Boolean,
+      default: false
+    },
+    loading: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -120,5 +126,54 @@ export default {
   overflow-y: auto;
   background-size: 100%;
   padding: 40px 20px;
+}
+.sc-message-list-no-header {
+  height: calc(80% + 40px);
+  padding: 12px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.message-list-empty {
+  padding: 0 12px;
+}
+
+.loading {
+  width: 50px;
+  height: 16px;
+  margin: 0 auto;
+}
+.loading span {
+  display: inline-block;
+  width: 6px;
+  height: 16px;
+  margin-right: 4px;
+  border-radius: 4px;
+  -webkit-animation: load 0.7s ease infinite;
+}
+@keyframes load {
+  0%,
+  100% {
+    height: 12px;
+    margin-bottom: -2px;
+    background: rgb(0, 23, 81);
+  }
+  50% {
+    height: 16px;
+    margin-bottom: -4px;
+    background: rgb(0, 23, 81);
+  }
+}
+.loading span:nth-child(2) {
+  -webkit-animation-delay: 0.14s;
+}
+.loading span:nth-child(3) {
+  -webkit-animation-delay: 0.28s;
+}
+.loading span:nth-child(4) {
+  -webkit-animation-delay: 0.42s;
+}
+.loading span:nth-child(5) {
+  -webkit-animation-delay: 0.56s;
 }
 </style>

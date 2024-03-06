@@ -1,10 +1,16 @@
 <template>
-  <div :style="{background: backgroundColor}">
-    <Header :chosen-color="chosenColor" :colors="colors" />
-    <beautiful-chat
+  <div :style="{background: backgroundColor, height: '100vh', display: 'flex'}">
+    <TestArea
+      :chosen-color="chosenColor"
+      :colors="colors"
+      :message-styling="messageStyling"
+      :on-message="sendMessage"
+      :on-typing="handleTyping"
+    />
+    <!-- <div style="width: 370px; height: 100%; border-left: 1px solid #e9e9e9"> -->
+    <Chat
       :always-scroll-to-bottom="alwaysScrollToBottom"
       :close="closeChat"
-      :colors="colors"
       :is-open="isChatOpen"
       :message-list="messageList"
       :message-styling="messageStyling"
@@ -21,88 +27,20 @@
       :show-deletion="true"
       :title-image-url="titleImageUrl"
       :disable-user-list-toggle="false"
-      @onType="handleOnType"
+      :as-second-chat-box="asSecondChatBox"
+      :show-header="true"
+      :chat-window-class="''"
+      :show-user-input="true"
+      :width="300"
+      :loading="true"
       @edit="editMessage"
-      @remove="removeMessage"
     >
-      <template v-slot:text-message-toolbox="scopedProps">
-        <button
-          v-if="!scopedProps.me && scopedProps.message.type === 'text'"
-          @click.prevent="like(scopedProps.message.id)"
-        >
-          👍
-        </button>
-      </template>
       <template v-slot:text-message-body="scopedProps">
-        <p class="sc-message--text-content" v-html="scopedProps.messageText"></p>
-        <p
-          v-if="scopedProps.message.data.meta"
-          class="sc-message--meta"
-          :style="{color: scopedProps.messageColors.color}"
-        >
-          {{ scopedProps.message.data.meta }}
-        </p>
-        <p
-          v-if="scopedProps.message.isEdited || scopedProps.message.liked"
-          class="sc-message--edited"
-        >
-          <template v-if="scopedProps.message.isEdited">✎</template>
-          <template v-if="scopedProps.message.liked">👍</template>
-        </p>
+        <div>{{ scopedProps.messageText }}</div>
       </template>
-      <template v-slot:system-message-body="{message}"> [System]: {{ message.text }} </template>
-    </beautiful-chat>
-    <p class="text-center toggle">
-      <a v-if="!isChatOpen" :style="{color: linkColor}" href="#" @click.prevent="openChat()"
-        >Open the chat window</a
-      >
-      <a v-else :style="{color: linkColor}" href="#" @click.prevent="closeChat()"
-        >Close the chat window</a
-      >
-    </p>
-    <p class="text-center colors">
-      <a
-        :style="{background: availableColors.blue.launcher.bg}"
-        href="#"
-        @click.prevent="setColor('blue')"
-        >Blue</a
-      >
-      <a
-        :style="{background: availableColors.red.launcher.bg}"
-        href="#"
-        @click.prevent="setColor('red')"
-        >Red</a
-      >
-      <a
-        :style="{background: availableColors.green.launcher.bg}"
-        href="#"
-        @click.prevent="setColor('green')"
-        >Green</a
-      >
-      <a
-        :style="{background: availableColors.dark.launcher.bg}"
-        href="#"
-        @click.prevent="setColor('dark')"
-        >Dark</a
-      >
-    </p>
-    <v-dialog />
-    <p class="text-center messageStyling">
-      <label
-        >Message styling enabled?
-        <input checked type="checkbox" @change="messageStylingToggled" />
-      </label>
-      <a href="#" @click.prevent="showStylingInfo()">info</a>
-    </p>
-    <TestArea
-      :chosen-color="chosenColor"
-      :colors="colors"
-      :message-styling="messageStyling"
-      :on-message="sendMessage"
-      :on-typing="handleTyping"
-    />
-    <Footer :chosen-color="chosenColor" :colors="colors" />
+    </Chat>
   </div>
+  <!-- </div> -->
 </template>
 
 <script>
@@ -112,13 +50,15 @@ import Header from './Header.vue'
 import Footer from './Footer.vue'
 import TestArea from './TestArea.vue'
 import availableColors from './colors'
+import Chat from '../../src/LauncherFixed.vue'
 
 export default {
   name: 'App',
   components: {
     Header,
     Footer,
-    TestArea
+    TestArea,
+    Chat
   },
   data() {
     return {
@@ -132,6 +72,7 @@ export default {
       availableColors,
       chosenColor: null,
       alwaysScrollToBottom: true,
+      asSecondChatBox: true,
       messageStyling: true,
       userIsTyping: false
     }
@@ -183,8 +124,7 @@ export default {
     showStylingInfo() {
       this.$modal.show('dialog', {
         title: 'Info',
-        text:
-          'You can use *word* to <strong>boldify</strong>, /word/ to <em>emphasize</em>, _word_ to <u>underline</u>, `code` to <code>write = code;</code>, ~this~ to <del>delete</del> and ^sup^ or ¡sub¡ to write <sup>sup</sup> and <sub>sub</sub>'
+        text: 'You can use *word* to <strong>boldify</strong>, /word/ to <em>emphasize</em>, _word_ to <u>underline</u>, `code` to <code>write = code;</code>, ~this~ to <del>delete</del> and ^sup^ or ¡sub¡ to write <sup>sup</sup> and <sub>sub</sub>'
       })
     },
     messageStylingToggled(e) {

@@ -1,14 +1,11 @@
 <template>
-  <div class="sc-header" :style="{background: colors.header.bg, color: colors.header.text}">
+  <div class="sc-header" :style="{backgroundColor: customThemeColor}">
     <slot>
-      <img v-if="titleImageUrl" class="sc-header--img" :src="titleImageUrl" alt="" />
-      <div v-if="!disableUserListToggle" class="sc-header--title enabled" @click="toggleUserList">
-        {{ title }}
-      </div>
-      <div v-else class="sc-header--title">{{ title }}</div>
+      <img class="sc-header--img" src="./assets/proxverse.png" alt="" />
+      <div class="sc-header--title">{{ title }}</div>
     </slot>
     <div v-if="showCloseButton" class="sc-header--close-button" @click="$emit('close')">
-      <img :src="icons.close.img" :alt="icons.close.name" />
+      <img :src="icons.close.img" />
     </div>
   </div>
 </template>
@@ -45,7 +42,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['disableUserListToggle', 'titleImageUrl', 'showCloseButton'])
+    ...mapState(['disableUserListToggle', 'titleImageUrl', 'showCloseButton', 'customThemeColor'])
   },
   methods: {
     toggleUserList() {
@@ -58,7 +55,7 @@ export default {
 
 <style scoped>
 .sc-header {
-  min-height: 75px;
+  min-height: 48px;
   border-top-left-radius: 9px;
   border-top-right-radius: 9px;
   padding: 10px;
@@ -66,9 +63,11 @@ export default {
   position: relative;
   box-sizing: border-box;
   display: flex;
+  color: #fff;
 }
 
 .sc-header--img {
+  width: 18px;
   border-radius: 50%;
   align-self: center;
   padding: 10px;
@@ -77,9 +76,10 @@ export default {
 .sc-header--title {
   align-self: center;
   padding: 10px;
+  padding-left: 0;
   flex: 1;
   user-select: none;
-  font-size: 20px;
+  font-size: 14px;
 }
 
 .sc-header--title.enabled {
@@ -92,6 +92,7 @@ export default {
 }
 
 .sc-header--close-button {
+  color: black;
   width: 40px;
   align-self: center;
   height: 40px;
@@ -100,10 +101,12 @@ export default {
   cursor: pointer;
   border-radius: 5px;
   margin-left: auto;
+  text-align: center;
+  line-height: 40px;
 }
 
 .sc-header--close-button:hover {
-  box-shadow: 0px 2px 5px rgba(0.2, 0.2, 0.5, 0.1);
+  /* box-shadow: 0px 2px 5px rgba(0.2, 0.2, 0.5, 0.1); */
 }
 
 .sc-header--close-button img {

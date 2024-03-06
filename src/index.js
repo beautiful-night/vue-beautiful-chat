@@ -1,4 +1,5 @@
-import Launcher from './Launcher.vue'
+import LauncherFixed from './LauncherFixed.vue'
+import LauncherAbsolute from './LauncherAbsolute.vue'
 import VTooltip from 'v-tooltip'
 
 const defaultComponentName = 'BeautifulChat'
@@ -27,7 +28,8 @@ const Plugin = {
     /**
      * Sets custom component name (if provided)
      */
-    Vue.component(this.componentName, Launcher)
+    Vue.component(this.componentName, LauncherFixed)
+    Vue.component('SimpleChat', LauncherAbsolute)
     Vue.use(VTooltip)
   }
 }

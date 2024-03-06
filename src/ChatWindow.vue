@@ -1,5 +1,24 @@
 <template>
-  <div class="sc-chat-window" :class="{opened: isOpen, closed: !isOpen}">
+  <div
+    class="sc-chat-window"
+    :class="{'opened': isOpen, 'closed': !isOpen, 'sc-chat-window-no-fixed': noFixed}"
+    :style="`width: ${width}px; height: ${height || 'calc(100% - 260px)'}`"
+  >
+    <div
+      v-if="isOpen && !noFixed"
+      class="sc-chat-modal sc-chat-modal-top"
+      @click="$emit('close')"
+    ></div>
+    <div
+      v-if="isOpen && !noFixed"
+      class="sc-chat-modal sc-chat-modal-left"
+      @click="$emit('close')"
+    ></div>
+    <div
+      v-if="isOpen && !noFixed"
+      class="sc-chat-modal sc-chat-modal-bottom"
+      @click="$emit('close')"
+    ></div>
     <Header
       v-if="showHeader"
       :title="title"
@@ -8,10 +27,9 @@
       @userList="handleUserListToggle"
     >
       <template>
-        <slot name="header"> </slot>
+        <slot name="header"></slot>
       </template>
     </Header>
-    <UserList v-if="showUserList" :colors="colors" :participants="participants" />
     <MessageList
       v-if="!showUserList"
       :messages="messages"
@@ -19,7 +37,9 @@
       :show-typing-indicator="showTypingIndicator"
       :colors="colors"
       :always-scroll-to-bottom="alwaysScrollToBottom"
+      :show-header="showHeader"
       :message-styling="messageStyling"
+      :loading="loading"
       @scrollToTop="$emit('scrollToTop')"
       @remove="$emit('remove', $event)"
     >
@@ -36,22 +56,16 @@
         >
         </slot>
       </template>
-      <template v-slot:system-message-body="scopedProps">
-        <slot name="system-message-body" :message="scopedProps.message"> </slot>
-      </template>
-      <template v-slot:text-message-toolbox="scopedProps">
-        <slot name="text-message-toolbox" :message="scopedProps.message" :me="scopedProps.me">
-        </slot>
-      </template>
     </MessageList>
     <UserInput
-      v-if="!showUserList"
+      v-if="showUserInput"
       :show-emoji="showEmoji"
       :on-submit="onUserInputSubmit"
       :suggestions="getSuggestions()"
       :show-file="showFile"
       :placeholder="placeholder"
       :colors="colors"
+      :as-second-chat-box="asSecondChatBox"
       @onType="$emit('onType')"
       @edit="$emit('edit', $event)"
     />
@@ -123,6 +137,30 @@ export default {
     messageStyling: {
       type: Boolean,
       required: true
+    },
+    asSecondChatBox: {
+      type: Boolean,
+      default: false
+    },
+    width: {
+      type: Number,
+      default: 370
+    },
+    noFixed: {
+      type: Boolean,
+      default: false
+    },
+    showUserInput: {
+      type: Boolean,
+      default: true
+    },
+    height: {
+      type: String,
+      default: null
+    },
+    loading: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -150,15 +188,14 @@ export default {
 
 <style scoped>
 .sc-chat-window {
-  width: 370px;
-  height: calc(100% - 120px);
-  max-height: 590px;
+  /* height: calc(100% - 120px); */
+  /* max-height: 680px; */
   position: fixed;
-  right: 25px;
-  bottom: 100px;
+  right: 0px;
+  bottom: 0px;
   box-sizing: border-box;
-  box-shadow: 0px 7px 40px 2px rgba(148, 149, 150, 0.1);
-  background: white;
+  box-shadow: 0px 4px 8px 2px rgba(120, 124, 165, 0.5);
+  background: #faf8f8;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -167,23 +204,32 @@ export default {
   animation: fadeIn;
   animation-duration: 0.3s;
   animation-timing-function: ease-in-out;
+  z-index: 1000;
+}
+
+.sc-chat-window-no-fixed {
+  position: relative;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .sc-chat-window.closed {
-  opacity: 0;
   display: none;
-  bottom: 90px;
+  bottom: 0px;
+  right: -400px;
 }
 
 @keyframes fadeIn {
   0% {
     display: none;
-    opacity: 0;
+    right: -400px;
   }
 
   100% {
     display: flex;
-    opacity: 1;
+    right: 0px;
   }
 }
 
@@ -192,6 +238,35 @@ export default {
 }
 .sc-message--them {
   text-align: left;
+}
+
+.sc-chat-modal {
+  position: fixed;
+  /* left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh; */
+  z-index: -1;
+}
+
+.sc-chat-modal-top {
+  width: 100vw;
+  height: 154px;
+  top: 0;
+  left: 0;
+}
+
+.sc-chat-modal-left {
+  width: 230px;
+  height: 100vh;
+  top: 0;
+  left: 0;
+}
+.sc-chat-modal-bottom {
+  width: 100vw;
+  height: 50px;
+  bottom: 0;
+  left: 0;
 }
 
 @media (max-width: 450px) {
