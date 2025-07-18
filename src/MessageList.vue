@@ -9,35 +9,38 @@
     :style="{backgroundColor: colors.messageList.bg}"
     @scroll="handleScroll"
   >
-    <Message
-      v-for="(message, idx) in messages"
-      :key="idx"
-      :message="message"
-      :user="profile(message.author)"
-      :colors="colors"
-      :message-styling="messageStyling"
-      @remove="$emit('remove', message)"
-    >
-      <template v-slot:text-message-body="scopedProps">
-        <slot
-          name="text-message-body"
-          :message="scopedProps.message"
-          :messageText="scopedProps.messageText"
-          :messageColors="scopedProps.messageColors"
-          :me="scopedProps.me"
-        >
-        </slot>
-      </template>
-      <template v-slot:system-message-body="scopedProps">
-        <slot name="system-message-body" :message="scopedProps.message"> </slot>
-      </template>
-    </Message>
-    <div v-if="loading" class="loading">
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
+    <div class="sc-message-box">
+      <Message
+        v-for="(message, idx) in messages"
+        :key="idx"
+        :message="message"
+        :user="profile(message.author)"
+        :colors="colors"
+        :message-styling="messageStyling"
+        :isFullscreen="isFullscreen"
+        @remove="$emit('remove', message)"
+      >
+        <template v-slot:text-message-body="scopedProps">
+          <slot
+            name="text-message-body"
+            :message="scopedProps.message"
+            :messageText="scopedProps.messageText"
+            :messageColors="scopedProps.messageColors"
+            :me="scopedProps.me"
+          >
+          </slot>
+        </template>
+        <template v-slot:system-message-body="scopedProps">
+          <slot name="system-message-body" :message="scopedProps.message"> </slot>
+        </template>
+      </Message>
+      <div v-if="loading" class="loading">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
     </div>
   </div>
 </template>
@@ -45,7 +48,6 @@
 <script>
 import Message from './Message.vue'
 import chatIcon from './assets/chat-icon.svg'
-import {mapState} from './store/'
 
 export default {
   components: {
@@ -83,6 +85,9 @@ export default {
     loading: {
       type: Boolean,
       default: false
+    },
+    isFullscreen: {
+      type: Boolean
     }
   },
   computed: {
@@ -122,10 +127,17 @@ export default {
 
 <style scoped>
 .sc-message-list {
-  height: 80%;
+  flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   background-size: 100%;
   padding: 40px 20px;
+}
+.sc-message-box {
+  margin: auto;
+  width: 100%;
+  min-height: 100%;
+  max-width: 768px;
 }
 .sc-message-list-no-header {
   height: calc(80% + 40px);

@@ -1,11 +1,13 @@
 <template>
   <div class="sc-header" :style="{backgroundColor: customThemeColor}">
     <slot>
-      <img class="sc-header--img" src="./assets/proxverse.png" alt="" />
+      <img class="sc-header--img" :src="titleImageUrl" alt="" />
       <div class="sc-header--title">{{ title }}</div>
     </slot>
-    <div v-if="showCloseButton" class="sc-header--close-button" @click="$emit('close')">
-      <img :src="icons.close.img" />
+    <div v-if="showCloseButton" class="sc-header--close-button">
+      <img v-if="!isFullscreen" src="./assets/fullscreen.svg" @click="$emit('onFullscreen')" />
+      <img v-else src="./assets/exit-fullscreen.svg" @click="$emit('onFullscreen')" />
+      <img :src="icons.close.img" @click="$emit('close')" />
     </div>
   </div>
 </template>
@@ -34,6 +36,9 @@ export default {
     colors: {
       type: Object,
       required: true
+    },
+    isFullscreen: {
+      type: Boolean
     }
   },
   data() {
@@ -92,11 +97,12 @@ export default {
 }
 
 .sc-header--close-button {
+  display: flex;
   color: black;
-  width: 40px;
+  width: 80px;
   align-self: center;
   height: 40px;
-  margin-right: 10px;
+  /* margin-right: 10px; */
   box-sizing: border-box;
   cursor: pointer;
   border-radius: 5px;
@@ -112,7 +118,7 @@ export default {
 .sc-header--close-button img {
   width: 100%;
   height: 100%;
-  padding: 13px;
+  padding: 12px;
   box-sizing: border-box;
 }
 

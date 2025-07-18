@@ -1,9 +1,16 @@
 <template>
-  <div :id="message.id" class="sc-message">
+  <div
+    :id="message.id"
+    :class="{
+      'sc-message': true,
+      'sc-message--received': message.author !== 'me' && message.type !== 'system',
+      'sc-message--send': message.author === 'me'
+    }"
+  >
     <div
       class="sc-message--content"
       :class="{
-        sent: message.author === 'me',
+        send: message.author === 'me',
         received: message.author !== 'me' && message.type !== 'system',
         system: message.type === 'system'
       }"
@@ -13,6 +20,7 @@
         :message="message"
         :message-colors="messageColors"
         :message-styling="messageStyling"
+        :isFullscreen="isFullscreen"
         @remove="$emit('remove')"
       >
         <template v-slot:default="scopedProps">
@@ -56,6 +64,9 @@ export default {
     user: {
       type: Object,
       required: true
+    },
+    isFullscreen: {
+      type: Boolean
     }
   },
   computed: {
@@ -66,7 +77,7 @@ export default {
       return (this.user && this.user.imageUrl) || chatIcon
     },
     messageColors() {
-      return this.message.author === 'me' ? this.sentColorsStyle : this.receivedColorsStyle
+      return this.message.author === 'me' ? this.sendColorsStyle : this.receivedColorsStyle
     },
     receivedColorsStyle() {
       return {
@@ -74,7 +85,7 @@ export default {
         backgroundColor: this.colors.receivedMessage.bg
       }
     },
-    sentColorsStyle() {
+    sendColorsStyle() {
       return {
         color: this.colors.sentMessage.text,
         backgroundColor: this.colors.sentMessage.bg
@@ -90,6 +101,7 @@ export default {
 .sc-message {
   margin-bottom: 10px;
   display: flex;
+  width: 100%;
   .sc-message--edited {
     opacity: 0.7;
     word-wrap: normal;
@@ -98,12 +110,36 @@ export default {
   }
 }
 
+.sc-message--received {
+  justify-content: left;
+}
+
+.sc-message--send {
+  justify-content: end;
+}
+
 .sc-message--content {
   width: 100%;
   display: flex;
 }
 
-.sc-message--content.sent {
+.sc-message--content.received {
+  .sc-message--text :not([class]) {
+    all: revert;
+    display: revert;
+  }
+  .sc-message--text :not([class]) {
+    h3 {
+      margin: 8px 0;
+    }
+    p {
+      margin: 6px 0;
+    }
+  }
+}
+
+.sc-message--content.send {
+  max-width: 75%;
   justify-content: flex-end;
 }
 
@@ -111,7 +147,7 @@ export default {
   justify-content: center;
 }
 
-.sc-message--content.sent .sc-message--avatar {
+.sc-message--content.send .sc-message--avatar {
   display: none;
 }
 
@@ -131,12 +167,6 @@ export default {
   margin-bottom: 0px;
   color: white;
   text-align: center;
-}
-
-@media (max-width: 450px) {
-  .sc-message {
-    width: 80%;
-  }
 }
 
 .tooltip {

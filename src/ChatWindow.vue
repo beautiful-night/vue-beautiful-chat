@@ -1,8 +1,13 @@
 <template>
   <div
+    ref="chatbox"
     class="sc-chat-window"
     :class="{'opened': isOpen, 'closed': !isOpen, 'sc-chat-window-no-fixed': noFixed}"
-    :style="`width: ${width}px; height: ${height || 'calc(100% - 260px)'}`"
+    :style="
+      isFullscreen
+        ? `width: 100vw; height: 100vh;left: 0; top: 0`
+        : `width: ${width}px; height: ${height || 'calc(100% - 260px)'};left: ${left}; top: ${top}`
+    "
   >
     <div
       v-if="isOpen && !noFixed"
@@ -23,8 +28,12 @@
       v-if="showHeader"
       :title="title"
       :colors="colors"
+      :isFullscreen="isFullscreen"
       @close="$emit('close')"
       @userList="handleUserListToggle"
+      @dblclick.native="onDbclickFullscreen"
+      @onFullscreen="onDbclickFullscreen"
+      @mousedown.native="startDrag"
     >
       <template>
         <slot name="header"></slot>
@@ -40,6 +49,7 @@
       :show-header="showHeader"
       :message-styling="messageStyling"
       :loading="loading"
+      :isFullscreen="isFullscreen"
       @scrollToTop="$emit('scrollToTop')"
       @remove="$emit('remove', $event)"
     >
@@ -66,6 +76,7 @@
       :placeholder="placeholder"
       :colors="colors"
       :as-second-chat-box="asSecondChatBox"
+      :isFullscreen="isFullscreen"
       @onType="$emit('onType')"
       @edit="$emit('edit', $event)"
     />
@@ -165,15 +176,26 @@ export default {
   },
   data() {
     return {
-      showUserList: false
+      uniqueId: Math.random().toString(36),
+      showUserList: false,
+      left: `calc(100vw - ${this.width}px)`,
+      top: this.height ? `calc(100vh - ${this.height})` : '260px',
+      isFullscreen: false
     }
   },
   computed: {
     messages() {
       let messages = this.messageList
-
       return messages
     }
+  },
+  mounted() {
+    // 添加全局键盘事件监听器
+    document.addEventListener('keydown', this.handleEsc, false)
+  },
+  beforeDestroy() {
+    // 组件销毁时移除监听器，避免内存泄露
+    document.removeEventListener('keydown', this.handleEsc, false)
   },
   methods: {
     handleUserListToggle(showUserList) {
@@ -181,6 +203,44 @@ export default {
     },
     getSuggestions() {
       return this.messages.length > 0 ? this.messages[this.messages.length - 1].suggestions : []
+    },
+    handleEsc(e) {
+      // Safari on iOS 也支持 e.key === 'Escape'
+      if (e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27) {
+        if (this.isFullscreen) {
+          this.isFullscreen = false
+        } else {
+          this.$emit('close')
+        }
+      }
+    },
+    onDbclickFullscreen() {
+      this.isFullscreen = !this.isFullscreen
+    },
+    startDrag(e) {
+      if (this.isFullscreen) return
+      const box = this.$refs.chatbox
+      const startX = e.clientX
+      const startY = e.clientY
+      const startLeft = box.offsetLeft
+      const startTop = box.offsetTop
+
+      const move = (e) => {
+        const deltaX = e.clientX - startX
+        const deltaY = e.clientY - startY
+        // box.style.left = `${startLeft + deltaX}px`
+        // box.style.top = `${startTop + deltaY}px`
+        this.left = startLeft + deltaX + 'px'
+        this.top = startTop + deltaY + 'px'
+      }
+
+      const up = () => {
+        document.removeEventListener('mousemove', move)
+        document.removeEventListener('mouseup', up)
+      }
+
+      document.addEventListener('mousemove', move)
+      document.addEventListener('mouseup', up)
     }
   }
 }
@@ -191,19 +251,14 @@ export default {
   /* height: calc(100% - 120px); */
   /* max-height: 680px; */
   position: fixed;
-  right: 0px;
-  bottom: 0px;
   box-sizing: border-box;
   box-shadow: 0px 4px 8px 2px rgba(120, 124, 165, 0.5);
-  background: #faf8f8;
+  /* background: #faf8f8; */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   border-radius: 10px;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  animation: fadeIn;
-  animation-duration: 0.3s;
-  animation-timing-function: ease-in-out;
   z-index: 1000;
 }
 
@@ -217,20 +272,7 @@ export default {
 
 .sc-chat-window.closed {
   display: none;
-  bottom: 0px;
-  right: -400px;
-}
-
-@keyframes fadeIn {
-  0% {
-    display: none;
-    right: -400px;
-  }
-
-  100% {
-    display: flex;
-    right: 0px;
-  }
+  left: 100vw;
 }
 
 .sc-message--me {
@@ -267,22 +309,5 @@ export default {
   height: 50px;
   bottom: 0;
   left: 0;
-}
-
-@media (max-width: 450px) {
-  .sc-chat-window {
-    width: 100%;
-    height: 100%;
-    max-height: 100%;
-    right: 0px;
-    bottom: 0px;
-    border-radius: 0px;
-  }
-  .sc-chat-window {
-    transition: 0.1s ease-in-out;
-  }
-  .sc-chat-window.closed {
-    bottom: 0px;
-  }
 }
 </style>

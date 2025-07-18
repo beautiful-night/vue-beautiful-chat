@@ -1,5 +1,5 @@
 <template>
-  <div class="sc-message--text">
+  <div :class="{'sc-message--text': true, 'sc-message--text__fullscreen': isFullscreen}">
     <slot :message="message" :messageText="messageText" :messageColors="messageColors" :me="me">
       <div class="sc-message--text-content" v-html="messageText"></div>
     </slot>
@@ -35,6 +35,9 @@ export default {
     messageStyling: {
       type: Boolean,
       required: true
+    },
+    isFullscreen: {
+      type: Boolean
     }
   },
   computed: {
@@ -65,13 +68,13 @@ export default {
 <style scoped lang="scss">
 .sc-message--text {
   padding: 12px;
-  border-radius: 4px;
+  border-radius: 12px;
   font-weight: 300;
   font-size: 14px;
   line-height: 1.4;
   position: relative;
   -webkit-font-smoothing: subpixel-antialiased;
-  background-color: #f1f6ff;
+  background-color: #f4f4f4;
   .sc-message--text-content {
     white-space: pre-wrap;
     padding: 8px 0;
@@ -108,6 +111,10 @@ export default {
   code {
     font-family: 'Courier New', Courier, monospace !important;
   }
+}
+
+.sc-message--text__fullscreen {
+  padding: 12px 24px;
 }
 
 .sc-message--content.sent .sc-message--text {

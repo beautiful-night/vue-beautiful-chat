@@ -31,8 +31,8 @@
       :show-header="true"
       :chat-window-class="''"
       :show-user-input="true"
-      :width="300"
-      :loading="true"
+      :width="460"
+      :loading="false"
       @edit="editMessage"
     >
       <template v-slot:text-message-body="scopedProps">

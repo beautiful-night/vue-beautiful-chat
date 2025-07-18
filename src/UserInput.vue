@@ -1,5 +1,5 @@
 <template>
-  <div style="padding: 12px">
+  <div :class="{'sc-user-input-box': true, 'sc-user-input-box_screenfull': !isFullscreen}">
     <!-- <Suggestions :suggestions="suggestions" :colors="colors" @sendSuggestion="_submitSuggestion" /> -->
     <div v-if="file" class="file-container">
       <span class="icon-file-message"
@@ -21,7 +21,11 @@
         tabIndex="0"
         contentEditable="plaintext-only"
         :placeholder="placeholder"
-        :class="{'sc-user-input--text': true, 'sc-user-input--text-second': asSecondChatBox}"
+        :class="{
+          'sc-user-input--text': true,
+          'sc-user-input--text__screenfull': isFullscreen,
+          'sc-user-input--text-second': asSecondChatBox
+        }"
         @focus="setInputActive(true)"
         @blur="setInputActive(false)"
         @keydown="handleKey"
@@ -131,6 +135,10 @@ export default {
     asSecondChatBox: {
       type: Boolean,
       default: false
+    },
+    isFullscreen: {
+      type: Boolean,
+      required: false
     }
   },
   data() {
@@ -169,7 +177,7 @@ export default {
       this.file = null
     },
     setInputActive(onoff) {
-      this.inputActive = onoff
+      // this.inputActive = onoff
     },
     handleKey(event) {
       if (event.keyCode === 13 && !event.shiftKey) {
@@ -278,21 +286,31 @@ export default {
 </script>
 
 <style scoped>
+.sc-user-input-box {
+  padding: 12px;
+  background-color: #fff;
+}
+.sc-user-input-box_screenfull {
+  background-color: #f4f4f4;
+}
 .sc-user-input {
   min-height: 44px;
-  margin: 0px;
+  margin: auto;
   position: relative;
   bottom: 0;
   display: flex;
-  background-color: #fff;
-  border-radius: 4px;
+  box-shadow: 0px 4px 4px 0px #0000000a, 0px 0px 1px 0px #0000009e;
+  max-width: 768px;
+  border-radius: 12px;
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .sc-user-input--text {
   flex-grow: 1;
   outline: none;
-  border-radius: 10px;
+  border-radius: 12px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
   box-sizing: border-box;
   padding: 12px;
   font-size: 15px;
@@ -301,15 +319,20 @@ export default {
   word-wrap: break-word; */
   color: #565867;
   -webkit-font-smoothing: antialiased;
-  max-height: 44px;
-  overflow-x: hidden;
-  overflow-y: auto;
+  max-height: 88px;
+  overflow-x: auto;
+  overflow-y: hidden;
   background-color: #fff;
   height: 44px;
-  overflow-x: scroll;
   padding: 12px;
-  height: 44px;
   white-space: nowrap;
+}
+
+.sc-user-input--text__screenfull {
+  height: 88px;
+  white-space: pre-wrap;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* .sc-user-input--text-second {
@@ -332,7 +355,9 @@ export default {
   align-items: end;
   padding: 0 4px;
   background-color: #fff;
-  border-radius: 4px;
+  border-radius: 12px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
   padding-bottom: 12px;
   padding-right: 12px;
 }
