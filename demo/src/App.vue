@@ -38,6 +38,10 @@
       <template v-slot:text-message-body="scopedProps">
         <div>{{ scopedProps.messageText }}</div>
       </template>
+      <template v-slot:user-quickly-input> 1 </template>
+      <template v-slot:scene-switch="scopedProps">
+        <div>2</div>
+      </template>
     </Chat>
   </div>
   <!-- </div> -->
@@ -66,7 +70,7 @@ export default {
       titleImageUrl: 'https://a.slack-edge.com/66f9/img/avatars-teams/ava_0001-34.png',
       messageList: messageHistory,
       newMessagesCount: 0,
-      isChatOpen: false,
+      isChatOpen: true,
       showTypingIndicator: '',
       colors: null,
       availableColors,

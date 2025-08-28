@@ -9,21 +9,6 @@
         : `width: ${width}px; height: ${height || 'calc(100% - 260px)'};left: ${left}; top: ${top}`
     "
   >
-    <div
-      v-if="isOpen && !noFixed"
-      class="sc-chat-modal sc-chat-modal-top"
-      @click="$emit('close')"
-    ></div>
-    <div
-      v-if="isOpen && !noFixed"
-      class="sc-chat-modal sc-chat-modal-left"
-      @click="$emit('close')"
-    ></div>
-    <div
-      v-if="isOpen && !noFixed"
-      class="sc-chat-modal sc-chat-modal-bottom"
-      @click="$emit('close')"
-    ></div>
     <Header
       v-if="showHeader"
       :title="title"
@@ -79,7 +64,14 @@
       :isFullscreen="isFullscreen"
       @onType="$emit('onType')"
       @edit="$emit('edit', $event)"
-    />
+    >
+      <template>
+        <slot name="user-quickly-input"> </slot>
+      </template>
+      <template v-slot:scene-switch>
+        <slot name="scene-switch"> </slot>
+      </template>
+    </UserInput>
   </div>
 </template>
 
@@ -302,12 +294,6 @@ export default {
   width: 230px;
   height: 100vh;
   top: 0;
-  left: 0;
-}
-.sc-chat-modal-bottom {
-  width: 100vw;
-  height: 50px;
-  bottom: 0;
   left: 0;
 }
 </style>

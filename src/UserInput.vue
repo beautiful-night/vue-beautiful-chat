@@ -1,7 +1,7 @@
 <template>
   <div :class="{'sc-user-input-box': true, 'sc-user-input-box_screenfull': !isFullscreen}">
     <!-- <Suggestions :suggestions="suggestions" :colors="colors" @sendSuggestion="_submitSuggestion" /> -->
-    <div v-if="file" class="file-container">
+    <!-- <div v-if="file" class="file-container">
       <span class="icon-file-message"
         ><img :src="icons.file.img" :alt="icons.file.name" height="15"
       /></span>
@@ -13,8 +13,12 @@
           height="10"
           title="Remove the file"
       /></span>
+    </div> -->
+    <div class="quickly-analysis">
+      <slot></slot>
     </div>
     <form class="sc-user-input" :class="{active: inputActive}">
+      <slot name="scene-switch"></slot>
       <div
         ref="userInput"
         role="button"
@@ -23,8 +27,8 @@
         :placeholder="placeholder"
         :class="{
           'sc-user-input--text': true,
-          'sc-user-input--text__screenfull': isFullscreen,
-          'sc-user-input--text-second': asSecondChatBox
+          // 'sc-user-input--text__screenfull': isFullscreen,
+          'sc-user-input--text-second': false
         }"
         @focus="setInputActive(true)"
         @blur="setInputActive(false)"
@@ -288,10 +292,15 @@ export default {
 <style scoped>
 .sc-user-input-box {
   padding: 12px;
+  padding-top: 0;
   background-color: #fff;
 }
 .sc-user-input-box_screenfull {
   background-color: #f4f4f4;
+}
+.quickly-analysis {
+  width: 100%;
+  height: 40px;
 }
 .sc-user-input {
   min-height: 44px;
@@ -303,10 +312,11 @@ export default {
   max-width: 768px;
   border-radius: 12px;
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  background-color: #fff;
 }
 
 .sc-user-input--text {
-  flex-grow: 1;
+  flex: 1;
   outline: none;
   border-radius: 12px;
   border-top-right-radius: 0px;
@@ -352,7 +362,7 @@ export default {
 
 .sc-user-input--buttons {
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   padding: 0 4px;
   background-color: #fff;
   border-radius: 12px;

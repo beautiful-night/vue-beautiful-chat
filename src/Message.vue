@@ -115,7 +115,7 @@ export default {
 }
 
 .sc-message--send {
-  justify-content: end;
+  justify-content: flex-end;
 }
 
 .sc-message--content {

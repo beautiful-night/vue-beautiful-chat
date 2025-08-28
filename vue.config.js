@@ -3,7 +3,7 @@ const isProd = process.env.NODE_ENV === 'production'
 module.exports = {
   lintOnSave: false,
   productionSourceMap: isProd,
-
+  outputDir: '/Users/chenqiankun/Public/pm-web/sp-engine-code/src/components/gpt/dist/',
   chainWebpack: (config) => {
     // Inline images & svgs into build
     config.module

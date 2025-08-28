@@ -2,17 +2,20 @@
   <div class="sp-chat-container">
     <div
       v-if="showLauncher && !isOpen"
-      ref="sc-launcher"
+      ref="scLauncher"
       class="sc-launcher"
       :class="{opened: isOpen}"
-      :style="{backgroundColor: customThemeColor}"
+      :style="`background-color: ${customThemeColor};`"
       @click.prevent="isOpen ? close() : openAndFocus()"
+      @mousedown="startDrag"
     >
-      <div v-if="newMessagesCount > 0 && !isOpen" class="sc-new-messsages-count">
-        {{ newMessagesCount }}
+      <div ref="scDrag" class="sc-drag">
+        <div v-if="newMessagesCount > 0 && !isOpen" class="sc-new-messsages-count">
+          {{ newMessagesCount }}
+        </div>
+        <img v-if="isOpen" class="sc-closed-icon" :src="icons.close.img" :alt="icons.close.name" />
+        <img v-else class="sc-open-icon" :src="icons.open.img" :alt="icons.open.name" />
       </div>
-      <img v-if="isOpen" class="sc-closed-icon" :src="icons.close.img" :alt="icons.close.name" />
-      <img v-else class="sc-open-icon" :src="icons.open.img" :alt="icons.open.name" />
     </div>
     <ChatWindow
       :class="chatWindowClass"
@@ -55,6 +58,12 @@
           :me="scopedProps.me"
         >
         </slot>
+      </template>
+      <template v-slot:user-quickly-input>
+        <slot name="user-quickly-input"></slot>
+      </template>
+      <template v-slot:scene-switch>
+        <slot name="scene-switch"> </slot>
       </template>
     </ChatWindow>
   </div>
@@ -276,7 +285,9 @@ export default {
     openAndFocus() {
       this.open()
       this.$root.$emit('focusUserInput')
-    }
+    },
+    // 事件在子级
+    startDrag(event) {}
   }
 }
 </script>
@@ -293,14 +304,18 @@ export default {
   background-position: center;
   background-repeat: no-repeat;
   position: fixed;
-  right: 0px;
-  bottom: 0px;
+  left: calc(100% - 60px);
+  top: calc(100% - 60px);
   border-radius: 50%;
   box-shadow: none;
   transition: box-shadow 0.2s ease-in-out;
   cursor: pointer;
   z-index: 2000;
   transform: translate(-24px, -24px);
+}
+.sc-drag {
+  width: 100%;
+  height: 100%;
 }
 
 .sc-launcher:before {
